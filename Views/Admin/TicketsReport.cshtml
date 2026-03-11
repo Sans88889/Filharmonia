@@ -1,0 +1,21 @@
+﻿@using Filharmonia.Services
+@model IEnumerable<EventReport>
+
+<h2>Raport biletów</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nazwa wydarzenia</th>
+            <th>Sprzedane bilety</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ticket in Model)
+        {
+            <tr>
+                <td>@ticket.EventName</td>
+                <td>@ticket.TicketsSold</td>
+            </tr>
+        }
+    </tbody>
+</table>

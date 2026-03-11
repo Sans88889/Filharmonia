@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "Kup bilet";
+    string eventName = ViewData["EventName"] as string;
+    string date = ViewData["Date"] as string;
+}
+
+<div class="container mt-5">
+    <h2>Kup bilet</h2>
+    <p><strong>Wydarzenie:</strong> @eventName</p>
+    <p><strong>Data:</strong> @date</p>
+
+    <!-- Opcje wyboru -->
+    <div class="mb-3">
+        <label class="form-label">Wybierz sposób zakupu:</label>
+        <select id="purchaseOption" class="form-select" onchange="handlePurchaseOptionChange()">
+            <option value="loggedIn">Zaloguj się na swoje konto</option>
+            <option value="guest">Kup bez rejestracji</option>
+        </select>
+    </div>
+
+    <!-- Formularz zakupu -->
+    <form id="purchaseForm" method="post" action="/Home/ConfirmPurchase">
+        <!-- Pola danych użytkownika (gość) -->
+        <div id="guestFields" style="display: none;">
+            <div class="mb-3">
+                <label for="name" class="form-label">Imię i nazwisko</label>
+                <input type="text" class="form-control" id="name" name="name">
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Adres e-mail</label>
+                <input type="email" class="form-control" id="email" name="email">
+            </div>
+        </div>
+
+        <!-- Ukryte dane wydarzenia -->
+        <input type="hidden" name="eventName" value="@eventName">
+        <input type="hidden" name="date" value="@date">
+
+        <button type="submit" class="btn btn-success">Potwierdź zakup</button>
+    </form>
+</div>
+
+<script>
+    function handlePurchaseOptionChange() {
+        const purchaseOption = document.getElementById("purchaseOption").value;
+        const guestFields = document.getElementById("guestFields");
+        const purchaseForm = document.getElementById("purchaseForm");
+
+        if (purchaseOption === "guest") {
+            guestFields.style.display = "block";
+            document.getElementById("name").setAttribute("required", "true");
+            document.getElementById("email").setAttribute("required", "true");
+            purchaseForm.action = "/Home/ConfirmPurchase";
+        } else {
+            guestFields.style.display = "none";
+            document.getElementById("name").removeAttribute("required");
+            document.getElementById("email").removeAttribute("required");
+            purchaseForm.action = "/Identity/Account/Login?returnUrl=" + encodeURIComponent("/Home/Kup?eventName=" + encodeURIComponent("@eventName") + "&date=" + encodeURIComponent("@date"));
+        }
+    }
+</script>

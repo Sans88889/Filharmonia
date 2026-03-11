@@ -1,0 +1,145 @@
+﻿
+@{
+    ViewData["Title"] = "Repertuar";
+}
+
+<h1>Repertuar</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filharmonia</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container-flex {
+            display: flex;
+            flex-wrap: nowrap;
+            height: calc(100vh - 56px); /* odejmujemy wysokość nawigacji */
+        }
+
+        .left-column, .right-column {
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .left-column {
+            width: 50%;
+            border-right: 1px solid #ddd;
+        }
+
+        .right-column {
+            width: 50%;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+            .calendar div {
+                text-align: center;
+                padding: 10px;
+                border: 1px solid #ddd;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+                .calendar div:hover {
+                    background-color: #f0f0f0;
+                }
+    </style>
+</head>
+<body>
+     <!-- Kontener na repertuar i kalendarz -->
+    <div class="container-flex">
+        <div class="left-column">
+            <h2>Aktualne występy</h2>
+            <div id="repertuar-list">
+                <div class="repertuar-item">
+                    <h3>Koncert Beethovena</h3>
+                    <p>Opis: Wspaniały wieczór z symfoniami Beethovena.</p>
+                </div>
+                <div class="repertuar-item">
+                    <h3>Jazz Night</h3>
+                    <p>Opis: Ekskluzywny koncert z najlepszymi muzykami jazzowymi.</p>
+                </div>
+                <div class="repertuar-item">
+                    <h3>Chopin Gala</h3>
+                    <p>Opis: Najpiękniejsze dzieła Fryderyka Chopina w wykonaniu mistrzów fortepianu.</p>
+                </div>
+            </div>
+        </div>
+        <div class="right-column">
+            <h2>Kalendarz</h2>
+            <div class="calendar" id="calendar">
+                <!-- JavaScript wygeneruje tutaj dni -->
+            </div>
+            <div id="day-details" style="margin-top: 20px;"></div>
+        </div>
+        <script>
+            const repertuarWeekday = [
+                { time: "16:00 - 18:00", event: "Koncert Beethovena" },
+                { time: "18:30 - 20:30", event: "Jazz Night" }
+            ];
+
+            const repertuarWeekend = [
+                { time: "14:30 - 16:30", event: "Koncert Beethovena" },
+                { time: "17:00 - 19:00", event: "Chopin Gala" },
+                { time: "19:30 - 21:30", event: "Jazz Night" }
+            ];
+
+            function generateRepertuar(day) {
+                const isWeekend = day === 6 || day === 0; // 6 - Sobota, 0 - Niedziela
+                return isWeekend ? repertuarWeekend : repertuarWeekday;
+            }
+
+            const calendar = document.getElementById('calendar');
+            const today = new Date();
+            const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                const date = new Date(today.getFullYear(), today.getMonth(), i);
+                const dateString = date.toISOString().split('T')[0];
+                day.textContent = i;
+                day.dataset.date = dateString;
+                day.addEventListener('click', () => showRepertuarForDate(date));
+                calendar.appendChild(day);
+            }
+
+            // Funkcja do wyświetlania repertuaru dla wybranego dnia
+            function showRepertuarForDate(date) {
+                const dayDetails = document.getElementById('day-details');
+                dayDetails.innerHTML = `<h3>Repertuar na dzień: ${date.toLocaleDateString()}</h3>`;
+
+                const dayOfWeek = date.getDay();
+                const repertuar = generateRepertuar(dayOfWeek);
+
+                repertuar.forEach(item => {
+                    const repertuarItem = document.createElement('div');
+                    repertuarItem.innerHTML = `
+                            <h4>${item.time}</h4>
+                            <p>${item.event}</p>
+                                              <a href="/Home/Kup?eventName=${encodeURIComponent(item.event)}&date=${encodeURIComponent(date.toISOString().split('T')[0])}" class="btn btn-primary btn-sm">Kup bilet</a>
+                                    `;
+                    dayDetails.appendChild(repertuarItem);
+                });
+            }
+
+            // Pokaż dzisiejszy repertuar domyślnie
+            showRepertuarForDate(today);
+        </script>
+
+
+
+</body>
+</html>
+
